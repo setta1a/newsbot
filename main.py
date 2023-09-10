@@ -26,7 +26,10 @@ logging.basicConfig(level=logging.INFO)
 # Обработчик команды /start
 @dp.message_handler(commands=['start'])
 async def on_start(message: types.Message):
-    await message.answer('Успешно!')
+    await message.answer('Команды бота:\n'
+                         '\n'
+                         '/newspage - Парсинг новостной страницы'
+                         '/mainpage - Парсинг главной страницы')
 
 
 # Обработчик команды /newspage
