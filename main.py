@@ -11,6 +11,11 @@ API_TOKEN = '6126747598:AAFfM1GS1CC96FPc4hUHLlGYoiszU6ck-zU'
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+channel_id = '-1001665710322'
+
+articles_news = []
+articles_main = []
+
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -36,6 +41,7 @@ async def on_newspage(message: types.Message):
 
     for i in range(len(links)):
         articles.append(Article(links[i]["href"]))
+        articles_news.append(articles[i])
         articles[i].get_info()
         articles[i].print()
 
@@ -46,7 +52,7 @@ async def on_newspage(message: types.Message):
         )
 
         markup = types.InlineKeyboardMarkup()
-        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(len(formatted_message)))
+        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
         markup.add(button1)
 
         await bot.send_message(message.chat.id,
@@ -63,16 +69,16 @@ async def on_mainpage(message: types.Message):
 
 @dp.callback_query_handler(lambda call: call.data.isdigit())
 async def send_message(call: types.CallbackQuery):
-    global update_text  # Предполагается, что update_text уже объявлен где-то в вашем коде
+    global articles_news
     message_index = int(call.data)
-    if message_index < len(update_text):
-        news = update_text[message_index]
+    if message_index < len(articles_news):
+        news = articles_news[message_index]
         formatted_message = (
-            f"*** {news['Заголовок']} *** \n\n\n"
-            f"{news['Описание']}\n\n"
+            f"*** {news.header} *** \n\n\n"
+            f"{news.text}\n\n"
             "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
         )
-        await bot.send_message(call.from_user.id, formatted_message, parse_mode="Markdown")
+        await bot.send_message(channel_id, formatted_message, parse_mode="Markdown")
 
 
 if __name__ == '__main__':
