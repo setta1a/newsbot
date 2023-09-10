@@ -65,6 +65,32 @@ async def on_newspage(message: types.Message):
 @dp.message_handler(commands=['mainpage'])
 async def on_mainpage(message: types.Message):
     await message.answer('Парсинг главной страницы')
+    url = "https://rg.ru/"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    links = soup.find_all("a", class_="ItemOfListStandard_imageLinkBox__wi4cV")
+    articles = []
+
+    for i in range(len(links)):
+        articles.append(Article(links[i]["href"]))
+        articles_main.append(articles[i])
+        articles[i].get_info()
+        articles[i].print()
+
+    formatted_message = (
+        f"*** {articles[i].header} *** \n\n\n"
+        f"{articles[i].text} \n\n"
+        "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
+    )
+
+    markup = types.InlineKeyboardMarkup()
+    button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
+    markup.add(button1)
+
+    await bot.send_message(message.chat.id,
+                           formatted_message,
+                           parse_mode="Markdown",
+                           reply_markup=markup)
 
 
 @dp.callback_query_handler(lambda call: call.data.isdigit())

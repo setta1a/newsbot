@@ -18,5 +18,6 @@ class Article:
             self.text = (soup.find("div", class_="PageContentCommonStyling_text__fCZrl").text + "\n"
                 + soup.find('div', class_='PageArticleContent_lead__gvX5C').text)
 
+
     def print(self):
         print(self.header, "; ", self.text)
