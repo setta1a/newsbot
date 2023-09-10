@@ -54,7 +54,7 @@ async def on_newspage(message: types.Message):
         )
 
         markup = types.InlineKeyboardMarkup()
-        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
+        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str((i, 0)))
         markup.add(button1)
 
         await bot.send_message(message.chat.id,
@@ -88,7 +88,7 @@ async def on_mainpage(message: types.Message):
         )
 
         markup = types.InlineKeyboardMarkup()
-        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
+        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str((i, 1)))
         markup.add(button1)
 
         if len(articles[i].header) + len(articles[i].text) <= 1000:
@@ -114,10 +114,13 @@ async def on_mainpage(message: types.Message):
 
 @dp.callback_query_handler(lambda call: call.data.isdigit())
 async def send_message(call: types.CallbackQuery):
-    global articles_news
-    message_index = int(call.data)
-    if message_index < len(articles_main):
-        news = articles_main[message_index]
+    if int(call.data[1]) == 1:
+        curr_articles = articles_main
+    else:
+        curr_articles = articles_news
+    message_index = int(call.data[0])
+    if message_index < len(curr_articles):
+        news = curr_articles[message_index]
         formatted_message = (
             f"*** {news.header} *** \n\n\n"
             f"{news.text}\n\n"
