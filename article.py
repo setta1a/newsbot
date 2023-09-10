@@ -11,5 +11,12 @@ class Article:
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         self.header = soup.find("h1", class_="PageArticleContent_title__RVnvC")
-        self.text = (soup.find("div", class_="PageContentCommonStyling_text__fCZrl"))
+        self.text = ""
         self.image = None
+        if self.header:
+            self.header = self.header.text
+            self.text = (soup.find("div", class_="PageContentCommonStyling_text__fCZrl").text + "\n"
+                + soup.find('div', class_='PageArticleContent_lead__gvX5C').text)
+
+    def print(self):
+        print(self.header, "; ", self.text)

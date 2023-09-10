@@ -37,9 +37,22 @@ async def on_newspage(message: types.Message):
     for i in range(len(links)):
         articles.append(Article(links[i]["href"]))
         articles[i].get_info()
+        articles[i].print()
 
-    print(articles)
+        formatted_message = (
+            f"*** {articles[i].header} *** \n\n\n"
+            f"{articles[i].text} \n\n"
+            "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
+        )
 
+        markup = types.InlineKeyboardMarkup()
+        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(len(formatted_message)))
+        markup.add(button1)
+
+        await bot.send_message(message.chat.id,
+                               formatted_message,
+                               parse_mode="Markdown",
+                               reply_markup=markup)
 
 
 # Обработчик команды /mainpage
@@ -48,6 +61,21 @@ async def on_mainpage(message: types.Message):
     await message.answer('Парсинг главной страницы')
 
 
+@dp.callback_query_handler(lambda call: call.data.isdigit())
+async def send_message(call: types.CallbackQuery):
+    global update_text  # Предполагается, что update_text уже объявлен где-то в вашем коде
+    message_index = int(call.data)
+    if message_index < len(update_text):
+        news = update_text[message_index]
+        formatted_message = (
+            f"*** {news['Заголовок']} *** \n\n\n"
+            f"{news['Описание']}\n\n"
+            "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
+        )
+        await bot.send_message(call.from_user.id, formatted_message, parse_mode="Markdown")
+
+
 if __name__ == '__main__':
     from aiogram import executor
+
     executor.start_polling(dp, skip_updates=True)
