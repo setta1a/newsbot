@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 async def on_start(message: types.Message):
     await message.answer('Команды бота:\n'
                          '\n'
-                         '/newspage - Парсинг новостной страницы'
+                         '/newspage - Парсинг новостной страницы\n'
                          '/mainpage - Парсинг главной страницы')
 
 
@@ -46,7 +46,6 @@ async def on_newspage(message: types.Message):
         articles.append(Article(links[i]["href"]))
         articles_news.append(articles[i])
         articles[i].get_info()
-        articles[i].print()
 
         formatted_message = (
             f"*** {articles[i].header} *** \n\n\n"
@@ -77,37 +76,70 @@ async def on_mainpage(message: types.Message):
     for i in range(len(links)):
         articles.append(Article(links[i]["href"]))
         articles_main.append(articles[i])
-        articles[i].get_info()
-        articles[i].print()
+        articles[i].get_main_info()
+        articles[i].image = soup.find_all("img", class_="Image_img__m9RSC ItemOfListStandard_image___sWCo")[i].get(
+            'src', None)
+        print(articles[i].image)
 
-    formatted_message = (
-        f"*** {articles[i].header} *** \n\n\n"
-        f"{articles[i].text} \n\n"
-        "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
-    )
+        formatted_message = (
+            f"*** {articles[i].header} *** \n\n\n"
+            f"{articles[i].text} \n\n"
+            "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
+        )
 
-    markup = types.InlineKeyboardMarkup()
-    button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
-    markup.add(button1)
+        markup = types.InlineKeyboardMarkup()
+        button1 = types.InlineKeyboardButton("Опубликовать", callback_data=str(i))
+        markup.add(button1)
 
-    await bot.send_message(message.chat.id,
-                           formatted_message,
-                           parse_mode="Markdown",
-                           reply_markup=markup)
+        if len(articles[i].header) + len(articles[i].text) <= 1000:
+            if articles[i].image:
+                await bot.send_photo(message.chat.id, articles[i].image, caption=formatted_message,
+                                     parse_mode="Markdown", reply_markup=markup)
+            else:
+                await bot.send_message(message.chat.id,
+                                       formatted_message,
+                                       parse_mode="Markdown",
+                                       reply_markup=markup)
+
+
+        elif len(articles[i].header) + len(articles[i].text) <= 4000:
+            if articles[i].image:
+                await bot.send_photo(message.chat.id, articles[i].image, parse_mode="Markdown")
+
+            await bot.send_message(message.chat.id,
+                                   formatted_message,
+                                   parse_mode="Markdown",
+                                   reply_markup=markup)
 
 
 @dp.callback_query_handler(lambda call: call.data.isdigit())
 async def send_message(call: types.CallbackQuery):
     global articles_news
     message_index = int(call.data)
-    if message_index < len(articles_news):
-        news = articles_news[message_index]
+    if message_index < len(articles_main):
+        news = articles_main[message_index]
         formatted_message = (
             f"*** {news.header} *** \n\n\n"
             f"{news.text}\n\n"
             "[Самые свежие новости тут](https://t.me/wb_articul_channel)"
         )
-        await bot.send_message(channel_id, formatted_message, parse_mode="Markdown")
+
+        if len(news.header) + len(news.text) <= 1000:
+            if news.image:
+                await bot.send_photo(channel_id, news.image, caption=formatted_message,
+                                     parse_mode="Markdown")
+            else:
+                await bot.send_message(channel_id,
+                                       formatted_message,
+                                       parse_mode="Markdown")
+
+        elif len(news.header) + len(news.text) <= 4000:
+            if news.image:
+                await bot.send_photo(channel_id, news.image, parse_mode="Markdown")
+
+            await bot.send_message(channel_id,
+                                   formatted_message,
+                                   parse_mode="Markdown",)
 
 
 if __name__ == '__main__':
