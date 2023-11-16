@@ -29,9 +29,10 @@ Git — распределённая система управления вер�
       - ![alt](https://i.ibb.co/pJknZDY/Screenshot-2023-11-16-at-11-10-16.png)
       - Commit changes.
       - ![alt](https://i.ibb.co/qx6PSRJ/Screenshot-2023-11-16-at-11-11-21.png)
+      - Успех.
 3. 2-ый способ. Добавление файла из ПК.
       - ![alt](https://i.ibb.co/d6Dnzv0/Screenshot-2023-11-16-at-11-06-37.png)
       - Выбираем файл для добавления на своем ПК.
-      - ![alt](https://i.ibb.co/mSNg22q/Screenshot-2023-11-16-at-11-30-46.png)
+      - ![alt](https://i.ibb.co/s9KrFBS/Screenshot-2023-11-16-at-12-06-31.png)
       - Commit changes.
       - Успех.
